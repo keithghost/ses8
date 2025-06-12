@@ -291,16 +291,16 @@
         })
         .then(data => {
           const repoNames = data.map(repo => repo.name);
-          if (repoNames.includes("ALPHA-MD")) {
+          if (repoNames.includes("KEITH-MD")) {
             const confirmation = confirm("✅ Fork verified! Press OK to continue to pairing.");
             if (confirmation) {
               document.querySelector('.fork-verification').style.display = 'none';
               document.getElementById('mainContainer').style.display = 'block';
             }
           } else {
-            const githubConfirmation = confirm("❌ You haven't forked ALPHA-MD repo. Press OK to fork it (don't modify the fork name).");
+            const githubConfirmation = confirm("❌ You haven't forked KEITH-MD repo. Press OK to fork it (don't modify the fork name).");
             if (githubConfirmation) {
-              window.location.href = "https://github.com/keithkeizzah/ALPHA-MD/fork";
+              window.location.href = "https://github.com/keithkeizzah/KEITH-MD/fork";
             } else {
               alert("You must fork the repo to continue.");
             }
