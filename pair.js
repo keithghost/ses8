@@ -83,7 +83,7 @@ router.get('/', async (req, res) => {
 
                     // Send session data
                     await keithBot.sendMessage(keithBot.user.id, {
-                        text: 'ALPHA;;;' + sessionData
+                        text: 'KEITH;;;' + sessionData
                     });
 
                     // Send random media content
