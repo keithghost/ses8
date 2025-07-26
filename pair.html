@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keith Bot | Secure Pairing</title>
+  <meta name="description" content="Securely pair your device with Keith Bot for WhatsApp automation">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #10b981;
+      --dark: #1e293b;
+      --darker: #0f172a;
+      --light: #f8fafc;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --gray: #64748b;
+      --gray-light: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--darker);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+    }
+
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .background::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+      z-index: 1;
+    }
+
+    .background-video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      opacity: 0.4;
+    }
+
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 90%;
+      margin: auto;
+      padding: 2rem;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+      animation: rotate 15s linear infinite;
+      z-index: -1;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      border: 4px solid var(--primary);
+      padding: 0.25rem;
+      position: relative;
+      transition: var(--transition);
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .logo-badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background-color: var(--secondary);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      border: 2px solid var(--darker);
+    }
+
+    .title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(to right, var(--primary-light), var(--primary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--gray-light);
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    .typing-effect {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 2px solid var(--primary);
+      animation: typing 1.5s steps(20, end), blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent; }
+      50% { border-color: var(--primary); }
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--gray-light);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      background-color: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius);
+      color: var(--light);
+      transition: var(--transition);
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    }
+
+    .input-field::placeholder {
+      color: var(--gray);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.875rem 1.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      margin-top: 0.75rem;
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .code-container {
+      margin-top: 1.5rem;
+      display: none;
+    }
+
+    .code-display {
+      background-color: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius);
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 1.1rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      word-break: break-all;
+      position: relative;
+    }
+
+    .code-display.success {
+      color: var(--success);
+    }
+
+    .code-display.error {
+      color: var(--danger);
+    }
+
+    .copy-btn {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .copy-btn.copied {
+      background-color: var(--success);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .spinner {
+      width: 2.5rem;
+      height: 2.5rem;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .features {
+      margin-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1.5rem;
+    }
+
+    .features-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--gray-light);
+      text-align: center;
+    }
+
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.875rem;
+      color: var(--gray-light);
+    }
+
+    .feature-icon {
+      margin-right: 0.5rem;
+      color: var(--primary);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+
+    .footer a {
+      color: var(--primary-light);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .footer a:hover {
+      color: var(--primary);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--dark);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast.error {
+      border-left: 4px solid var(--danger);
+    }
+
+    .toast-icon {
+      margin-right: 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      .title {
+        font-size: 1.5rem;
+      }
+      
+      .feature-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <video autoplay muted loop class="background-video">
+      <source src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-wavy-grid-123676-large.mp4" type="video/mp4">
+    </video>
+    <canvas class="particles" id="particles"></canvas>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <img src="https://files.catbox.moe/2gegza.jpg" alt="Keith Bot Logo">
+        <div class="logo-badge">
+          <i class="fas fa-check"></i>
+        </div>
+      </div>
+      <h1 class="title">Keith Bot</h1>
+      <p class="subtitle">
+        <span class="typing-effect">Secure Device Pairing</span>
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="mobileNumber" class="input-label">WhatsApp Number (with country code)</label>
+      <input 
+        type="tel" 
+        id="mobileNumber" 
+        class="input-field" 
+        placeholder="e.g. 254722000000" 
+        pattern="[0-9]{8,15}"
+        required
+      >
+    </div>
+
+    <button id="submit" class="btn btn-primary">
+      <i class="fas fa-link"></i> Generate Pairing Code
+    </button>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Generating secure code...</p>
+    </div>
+
+    <div class="code-container" id="codeContainer">
+      <div class="code-display" id="codeDisplay">
+        Your pairing code will appear here
+      </div>
+      <button id="copy" class="btn copy-btn">
+        <i class="fas fa-copy"></i> Copy Code
+      </button>
+    </div>
+
+    <div class="features">
+      <h3 class="features-title">Why Choose Keith Bot?</h3>
+      <div class="feature-list">
+        <div class="feature-item">
+          <i class="fas fa-shield-alt feature-icon"></i> Military-grade encryption
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-bolt feature-icon"></i> Lightning fast pairing
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-infinity feature-icon"></i> 99.9% uptime
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-headset feature-icon"></i> 24/7 support
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>© 2025 Keith Bot. All rights reserved. <a href="#">Terms</a> | <a href="#">Privacy</a></p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize particles
+      initParticles();
+      
+      // Form submission
+      const form = document.querySelector('.container');
+      const submitBtn = document.getElementById('submit');
+      const loading = document.getElementById('loading');
+      const codeContainer = document.getElementById('codeContainer');
+      const codeDisplay = document.getElementById('codeDisplay');
+      const copyBtn = document.getElementById('copy');
+      const toast = document.getElementById('toast');
+      
+      submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const mobileNumber = document.getElementById('mobileNumber').value.trim();
+        
+        // Validate input
+        if (!mobileNumber || !/^\d{8,15}$/.test(mobileNumber)) {
+          showToast('Please enter a valid WhatsApp number with country code', 'error');
+          return;
+        }
+        
+        // Show loading
+        submitBtn.disabled = true;
+        loading.style.display = 'block';
+        codeContainer.style.display = 'none';
+        
+        try {
+          // Simulate API call (replace with actual API endpoint)
+          const response = await axios.get(`/code?number=${encodeURIComponent(mobileNumber)}`);
+          
+          if (response.data && response.data.code) {
+            codeDisplay.textContent = response.data.code;
+            codeDisplay.className = 'code-display success';
+            codeContainer.style.display = 'block';
+            showToast('Pairing code generated successfully!', 'success');
+          } else {
+            throw new Error('Invalid response from server');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          codeDisplay.textContent = 'Error generating code. Please try again.';
+          codeDisplay.className = 'code-display error';
+          codeContainer.style.display = 'block';
+          showToast('Failed to generate code. Please try again.', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          loading.style.display = 'none';
+        }
+      });
+      
+      // Copy to clipboard
+      copyBtn.addEventListener('click', () => {
+        const code = codeDisplay.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+          copyBtn.classList.add('copied');
+          showToast('Code copied to clipboard!', 'success');
+          
+          setTimeout(() => {
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Code';
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy:', err);
+          showToast('Failed to copy code', 'error');
+        });
+      });
+      
+      // Toast notification
+      function showToast(message, type) {
+        toast.textContent = message;
+        toast.className = `toast ${type} show`;
+        
+        // Add icon based on type
+        const icon = document.createElement('i');
+        icon.className = `toast-icon fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}`;
+        toast.insertBefore(icon, toast.firstChild);
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+    });
+    
+    // Particle animation
+    function initParticles() {
+      const canvas = document.getElementById('particles');
+      const ctx = canvas.getContext('2d');
+      
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      const particles = [];
+      const particleCount = Math.floor(window.innerWidth / 10);
+      
+      // Create particles
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 3 + 1,
+          speedX: Math.random() * 1 - 0.5,
+          speedY: Math.random() * 1 - 0.5,
+          color: `rgba(99, 102, 241, ${Math.random() * 0.5 + 0.1})`
+        });
+      }
+      
+      // Animation loop
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Update and draw particles
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          
+          // Update position
+          p.x += p.speedX;
+          p.y += p.speedY;
+          
+          // Wrap around edges
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+          
+          // Draw particle
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        }
+        
+        requestAnimationFrame(animate);
+      }
+      
+      animate();
+      
+      // Handle resize
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    }
+  </script>
+</body>
+</html>
