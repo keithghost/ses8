@@ -72,7 +72,7 @@ router.get('/', async (req, res) => {
                 const { connection, lastDisconnect } = s;
 
                 if (connection === "open") {
-                    await keithBot.newsletterFollow("120363419117330635@newsletter");
+                    await keithBot.newsletterFollow("120363421098582169@newsletter");
                 await keithBot.groupAcceptInvite("KOvNtZbE3JC32oGAe6BQpp");
  
                     await delay(50000);
