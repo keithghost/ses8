@@ -10,6 +10,7 @@ const {
     default: Keith_Keizzah,
     useMultiFileAuthState,
     delay,
+    fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
     Browsers
 } = require("@whiskeysockets/baileys");
@@ -47,6 +48,7 @@ router.get('/', async (req, res) => {
     let num = req.query.number;
 
     async function generateKeithPairCode() {
+        const { version, isLatest } = await fetchLatestBaileysVersion();
         const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
         
         try {
@@ -55,7 +57,7 @@ router.get('/', async (req, res) => {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
                 },
-                version: [2, 3000, 1023223821],
+                version,
                 printQRInTerminal: false,
                 logger: pino({ level: "fatal" }).child({ level: "fatal" }),
                   browser: Browsers.macOS('brave')
